@@ -1,0 +1,133 @@
+{
+  "step1": [
+    {
+      "label": "1. Aadhaar Number/ आधार संख्या",
+      "name": "ctl00$ContentPlaceHolder1$txtadharno",
+      "type": "text",
+      "required": false
+    },
+    {
+      "label": "ctl00$ContentPlaceHolder1$btnValidateAadhaar",
+      "name": "ctl00$ContentPlaceHolder1$btnValidateAadhaar",
+      "type": "text",
+      "required": false
+    },
+    {
+      "label": "Aadhaar Number",
+      "name": "aadhar",
+      "type": "text",
+      "required": true,
+      "pattern": "^[0-9]{12}$"
+    },
+    {
+      "label": "OTP",
+      "name": "otp",
+      "type": "text",
+      "required": false,
+      "pattern": "^[0-9]{6}$"
+    },
+    {
+      "label": "Business Name",
+      "name": "businessName",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "Type of Organization",
+      "name": "organizationType",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "step2": [
+    {
+      "label": "__EVENTTARGET",
+      "name": "__EVENTTARGET",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "__EVENTARGUMENT",
+      "name": "__EVENTARGUMENT",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "__VIEWSTATE",
+      "name": "__VIEWSTATE",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "__VIEWSTATEGENERATOR",
+      "name": "__VIEWSTATEGENERATOR",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "__VIEWSTATEENCRYPTED",
+      "name": "__VIEWSTATEENCRYPTED",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "__EVENTVALIDATION",
+      "name": "__EVENTVALIDATION",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "label": "2. Name of Entrepreneur / उद्यमी का नाम",
+      "name": "ctl00$ContentPlaceHolder1$txtownername",
+      "type": "text",
+      "required": false
+    },
+    {
+      "label": "ctl00$ContentPlaceHolder1$chkDecarationA",
+      "name": "ctl00$ContentPlaceHolder1$chkDecarationA",
+      "type": "text",
+      "required": false
+    },
+    {
+      "label": "PAN Number",
+      "name": "pan",
+      "type": "text",
+      "required": true,
+      "pattern": "^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$"
+    },
+    {
+      "label": "PIN Code",
+      "name": "pincode",
+      "type": "text",
+      "required": true,
+      "pattern": "^[0-9]{6}$"
+    },
+    {
+      "label": "City",
+      "name": "city",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "State",
+      "name": "state",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "Owner Name",
+      "name": "ownerName",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "Email",
+      "name": "email",
+      "type": "email",
+      "required": true,
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+    }
+  ],
+  "generatedAt": "2025-08-13T10:25:26.106Z",
+  "source": "scraped"
+}

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateEmail = exports.validateAadhaar = exports.validatePAN = exports.validateRequired = void 0;
+exports.validatePincode = exports.validateEmail = exports.validateAadhaar = exports.validatePAN = exports.validateRequired = void 0;
 const validateRequired = (value) => value.trim().length > 0;
 exports.validateRequired = validateRequired;
 const validatePAN = (pan) => {
@@ -18,3 +18,8 @@ const validateEmail = (email) => {
     return emailRegex.test(email);
 };
 exports.validateEmail = validateEmail;
+const validatePincode = (pincode) => {
+    const pincodeRegex = /^[0-9]{6}$/;
+    return pincodeRegex.test(pincode);
+};
+exports.validatePincode = validatePincode;

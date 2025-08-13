@@ -15,5 +15,8 @@ model Registration {
   ownerName        String
   aadhar           String
   email            String
+  pincode          String
+  city             String
+  state            String
   createdAt        DateTime @default(now())
 }

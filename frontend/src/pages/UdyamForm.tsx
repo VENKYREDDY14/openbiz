@@ -1,48 +1,96 @@
-import React, { useState } from "react";
-import schema from "../schema/scrapedSchema.json";
+import React, { useEffect, useState } from "react";
 import InputField from "../components/InputField";
+import { ClipLoader } from "react-spinners";
+import { FaCircle } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+interface Field {
+  label: string;
+  name: string;
+  type: string;
+  required: boolean;
+  pattern?: string;
+}
+
+interface Schema {
+  step1: Field[];
+  step2: Field[];
+}
 
 interface Errors {
   [key: string]: string;
 }
 
 const UdyamForm: React.FC = () => {
+  const [schema, setSchema] = useState<Schema | null>(null);
+  const [loadingSchema, setLoadingSchema] = useState(true);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Errors>({});
-  const [loading, setLoading] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingPin, setLoadingPin] = useState(false);
 
-  // Live validation patterns
   const patterns: Record<string, RegExp> = {
     pan: /^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/,
     aadhar: /^[0-9]{12}$/,
-    pincode: /^[0-9]{6}$/
+    pincode: /^[0-9]{6}$/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/udyam-fields`);
+        const data = await res.json();
+        if (data.success) {
+          const clean = {
+            step1: data.data.step1.filter(
+              (f: Field) =>
+                !f.name.startsWith("__") &&
+                !f.name.toLowerCase().includes("contentplaceholder") &&
+                f.name.toLowerCase() !== "otp"
+            ),
+            step2: data.data.step2.filter(
+              (f: Field) =>
+                !f.name.startsWith("__") &&
+                !f.name.toLowerCase().includes("contentplaceholder") &&
+                f.name.toLowerCase() !== "otp"
+            ),
+          };
+          setSchema(clean);
+        }
+      } catch (err) {
+        console.error("Error fetching schema:", err);
+        toast.error("Failed to load form schema.");
+      } finally {
+        setLoadingSchema(false);
+      }
+    })();
+  }, []);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let { name, value } = e.target;
 
-    // Auto-format PAN & Aadhaar
-    if (name === "pan") {
-      value = value.toUpperCase();
-    }
-    if (name === "aadhar") {
-      value = value.replace(/\D/g, "").slice(0, 12); // only digits
-    }
+    if (name === "pan") value = value.toUpperCase();
+    if (name === "aadhar") value = value.replace(/\D/g, "").slice(0, 12);
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Live validation
-    if (patterns[name] && value && !patterns[name].test(value)) {
+    const pattern =
+      schema?.step1.concat(schema.step2).find((f) => f.name === name)?.pattern;
+    const regex = pattern ? new RegExp(pattern) : patterns[name];
+    if (regex && value && !regex.test(value)) {
       setErrors((prev) => ({ ...prev, [name]: `Invalid ${name}` }));
     } else {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
 
-    // Auto-fetch city/state from PIN
     if (name === "pincode" && patterns.pincode.test(value)) {
+      setLoadingPin(true);
       try {
         const res = await fetch(`https://api.postalpincode.in/pincode/${value}`);
         const data = await res.json();
@@ -51,17 +99,26 @@ const UdyamForm: React.FC = () => {
           setFormData((prev) => ({
             ...prev,
             city: District,
-            state: State
+            state: State,
           }));
         }
-      } catch {
-        console.error("PIN lookup failed");
+      } catch (err) {
+        console.error("PIN lookup failed", err);
+        toast.error("Failed to fetch city/state for given pincode.");
+      } finally {
+        setLoadingPin(false);
       }
     }
   };
 
   const validateStep = () => {
-    const currentFields = step === 1 ? schema.step1 : schema.step2;
+    if (!schema) return false;
+    const currentFields = (step === 1 ? schema.step1 : schema.step2).filter(
+      (f) =>
+        !f.name.startsWith("__") &&
+        !f.name.toLowerCase().includes("contentplaceholder") &&
+        f.name.toLowerCase() !== "otp"
+    );
     const newErrors: Errors = {};
 
     currentFields.forEach((field) => {
@@ -78,9 +135,7 @@ const UdyamForm: React.FC = () => {
   };
 
   const nextStep = () => {
-    if (validateStep()) {
-      setStep(step + 1);
-    }
+    if (validateStep()) setStep(step + 1);
   };
 
   const prevStep = () => setStep(step - 1);
@@ -89,7 +144,7 @@ const UdyamForm: React.FC = () => {
     e.preventDefault();
     if (!validateStep()) return;
 
-    setLoading(true);
+    setLoadingSubmit(true);
     try {
       const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
@@ -98,24 +153,31 @@ const UdyamForm: React.FC = () => {
       });
 
       if (response.ok) {
-        alert("Registration successful!");
+        toast.success("🎉 Registration successful!");
         setFormData({});
         setStep(1);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Registration failed.");
+        toast.error(errorData.error || "Registration failed.");
       }
     } catch (err) {
       console.error(err);
-      alert("Network error or server is down.");
+      toast.error("Network error or server is down.");
     }
-    setLoading(false);
+    setLoadingSubmit(false);
   };
 
   const renderFields = () => {
-    const currentFields = step === 1 ? schema.step1 : schema.step2;
+    if (!schema) return null;
+    const currentFields = (step === 1 ? schema.step1 : schema.step2).filter(
+      (f) =>
+        !f.name.startsWith("__") &&
+        !f.name.toLowerCase().includes("contentplaceholder") &&
+        f.name.toLowerCase() !== "otp"
+    );
+
     return currentFields.map((field) => (
-      <div key={field.name}>
+      <div key={field.name} className="relative">
         <InputField
           label={field.label}
           name={field.name}
@@ -124,6 +186,11 @@ const UdyamForm: React.FC = () => {
           onChange={handleChange}
           required={field.required}
         />
+        {loadingPin && (field.name === "city" || field.name === "state") && (
+          <div className="absolute right-3 top-9">
+            <ClipLoader size={20} color="#2584C6" />
+          </div>
+        )}
         {errors[field.name] && (
           <p className="text-red-500 text-sm mb-2">{errors[field.name]}</p>
         )}
@@ -131,22 +198,37 @@ const UdyamForm: React.FC = () => {
     ));
   };
 
+  if (loadingSchema) {
+    return (
+      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded">
+        Loading form…
+      </div>
+    );
+  }
+
+  if (!schema) {
+    return (
+      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded text-red-600">
+        Failed to load form schema.
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow rounded">
-      {/* Progress Tracker */}
-      <div className="mb-4">
-        <div className="flex justify-between text-sm mb-1">
-          <span className={step === 1 ? "font-bold text-blue-600" : ""}>Step 1</span>
-          <span className={step === 2 ? "font-bold text-blue-600" : ""}>Step 2</span>
-        </div>
-        <div className="relative w-full bg-gray-200 h-2 rounded-full">
-          <div
-            className={`absolute top-0 left-0 h-2 rounded-full transition-all duration-300 ${
-              step === 1 ? "w-1/2 bg-blue-500" : "w-full bg-green-500"
-            }`}
-          ></div>
-        </div>
+      <div className="flex items-center justify-center mb-6">
+        <FaCircle className={step >= 1 ? "text-[#2584C6]" : "text-gray-300"} />
+        <div
+          className={`flex-1 h-1 ${step >= 2 ? "bg-[#2584C6]" : "bg-gray-300"}`}
+        ></div>
+        <FaCircle className={step === 2 ? "text-[#2584C6]" : "text-gray-300"} />
       </div>
+
+      <h2 className="text-xl font-bold mb-4">
+        {step === 1
+          ? "Step 1: Business Details"
+          : "Step 2: Owner & Address Details"}
+      </h2>
 
       <form onSubmit={handleSubmit}>
         {renderFields()}
@@ -165,23 +247,27 @@ const UdyamForm: React.FC = () => {
             <button
               type="button"
               onClick={nextStep}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-[#2584C6] text-white rounded hover:bg-[#1f6fa7]"
             >
               Next
             </button>
           ) : (
             <button
               type="submit"
-              disabled={loading}
+              disabled={loadingSubmit}
               className={`px-4 py-2 text-white rounded ${
-                loading ? "bg-green-300" : "bg-green-600 hover:bg-green-700"
+                loadingSubmit
+                  ? "bg-green-300 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {loading ? "Submitting..." : "Submit"}
+              {loadingSubmit ? "Submitting..." : "Submit"}
             </button>
           )}
         </div>
       </form>
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

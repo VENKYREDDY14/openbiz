@@ -10,7 +10,7 @@ const Home: React.FC = () => {
       </p>
       <Link
         to="/register"
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="px-4 py-2 bg-[#2584C6] text-white rounded hover:bg-[#1f6fa7]"
       >
         Start Registration
       </Link>
