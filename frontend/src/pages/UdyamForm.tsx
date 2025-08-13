@@ -153,7 +153,7 @@ const UdyamForm: React.FC = () => {
       });
 
       if (response.ok) {
-        toast.success("🎉 Registration successful!");
+        toast.success("Registration successful!");
         setFormData({});
         setStep(1);
       } else {
