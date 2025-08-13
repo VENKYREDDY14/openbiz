@@ -5,8 +5,7 @@ import { FaCircle } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL+"/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL+"/api";
 
 interface Field {
   label: string;
@@ -43,8 +42,10 @@ const UdyamForm: React.FC = () => {
 
   useEffect(() => {
     (async () => {
+      setLoadingSchema(true);
       try {
         const res = await fetch(`${API_BASE_URL}/udyam-fields`);
+        if (!res.ok) throw new Error("Network response not ok");
         const data = await res.json();
         if (data.success) {
           const clean = {
@@ -200,8 +201,9 @@ const UdyamForm: React.FC = () => {
 
   if (loadingSchema) {
     return (
-      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded">
-        Loading form…
+      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded flex items-center justify-center">
+        <ClipLoader size={40} color="#2584C6" />
+        <span className="ml-3 text-gray-700">Loading form…</span>
       </div>
     );
   }
@@ -261,7 +263,14 @@ const UdyamForm: React.FC = () => {
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {loadingSubmit ? "Submitting..." : "Submit"}
+              {loadingSubmit ? (
+                <div className="flex items-center">
+                  <ClipLoader size={18} color="#fff" />
+                  <span className="ml-2">Submitting...</span>
+                </div>
+              ) : (
+                "Submit"
+              )}
             </button>
           )}
         </div>
