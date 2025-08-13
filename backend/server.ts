@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'https://openbiz-kappa.vercel.app'
+  origin: 'https://openbiz-beta.vercel.app'
 }));
 app.use(express.json());
 app.use('/api', registrationRoutes);
