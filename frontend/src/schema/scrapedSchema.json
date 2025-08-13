@@ -1,0 +1,64 @@
+{
+  "step1": [
+    {
+      "label": "Business Name",
+      "name": "businessName",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "Type of Organization",
+      "name": "organizationType",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "PAN Number",
+      "name": "pan",
+      "type": "text",
+      "required": true,
+      "pattern": "^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$"
+    }
+  ],
+  "step2": [
+    {
+      "label": "Owner Name",
+      "name": "ownerName",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "Aadhar Number",
+      "name": "aadhar",
+      "type": "text",
+      "required": true,
+      "pattern": "^[0-9]{12}$"
+    },
+    {
+      "label": "Email",
+      "name": "email",
+      "type": "email",
+      "required": true,
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+    },
+    {
+      "label": "PIN Code",
+      "name": "pincode",
+      "type": "text",
+      "required": true,
+      "pattern": "^[0-9]{6}$"
+    },
+    {
+      "label": "City",
+      "name": "city",
+      "type": "text",
+      "required": true
+    },
+    {
+      "label": "State",
+      "name": "state",
+      "type": "text",
+      "required": true
+    }
+  ]
+}
