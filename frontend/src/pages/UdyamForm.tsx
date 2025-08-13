@@ -5,7 +5,7 @@ import { FaCircle } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL+"/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api";
 
 interface Field {
   label: string;
@@ -201,82 +201,88 @@ const UdyamForm: React.FC = () => {
 
   if (loadingSchema) {
     return (
-      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded flex items-center justify-center">
-        <ClipLoader size={40} color="#2584C6" />
-        <span className="ml-3 text-gray-700">Loading form…</span>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="p-6 bg-white shadow rounded flex items-center">
+          <ClipLoader size={40} color="#2584C6" />
+          <span className="ml-3 text-gray-700">Loading form…</span>
+        </div>
       </div>
     );
   }
 
   if (!schema) {
     return (
-      <div className="max-w-lg mx-auto p-6 bg-white shadow rounded text-red-600">
-        Failed to load form schema.
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="max-w-lg p-6 bg-white shadow rounded text-red-600 text-center">
+          Failed to load form schema.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow rounded">
-      <div className="flex items-center justify-center mb-6">
-        <FaCircle className={step >= 1 ? "text-[#2584C6]" : "text-gray-300"} />
-        <div
-          className={`flex-1 h-1 ${step >= 2 ? "bg-[#2584C6]" : "bg-gray-300"}`}
-        ></div>
-        <FaCircle className={step === 2 ? "text-[#2584C6]" : "text-gray-300"} />
-      </div>
-
-      <h2 className="text-xl font-bold mb-4">
-        {step === 1
-          ? "Step 1: Business Details"
-          : "Step 2: Owner & Address Details"}
-      </h2>
-
-      <form onSubmit={handleSubmit}>
-        {renderFields()}
-
-        <div className="flex justify-between mt-6">
-          {step > 1 && (
-            <button
-              type="button"
-              onClick={prevStep}
-              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-            >
-              Back
-            </button>
-          )}
-          {step < 2 ? (
-            <button
-              type="button"
-              onClick={nextStep}
-              className="px-4 py-2 bg-[#2584C6] text-white rounded hover:bg-[#1f6fa7]"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loadingSubmit}
-              className={`px-4 py-2 text-white rounded ${
-                loadingSubmit
-                  ? "bg-green-300 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
-            >
-              {loadingSubmit ? (
-                <div className="flex items-center">
-                  <ClipLoader size={18} color="#fff" />
-                  <span className="ml-2">Submitting...</span>
-                </div>
-              ) : (
-                "Submit"
-              )}
-            </button>
-          )}
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="max-w-lg w-full p-6 bg-white shadow rounded">
+        <div className="flex items-center justify-center mb-6">
+          <FaCircle className={step >= 1 ? "text-[#2584C6]" : "text-gray-300"} />
+          <div
+            className={`flex-1 h-1 ${step >= 2 ? "bg-[#2584C6]" : "bg-gray-300"}`}
+          ></div>
+          <FaCircle className={step === 2 ? "text-[#2584C6]" : "text-gray-300"} />
         </div>
-      </form>
 
-      <ToastContainer position="top-right" autoClose={3000} />
+        <h2 className="text-xl font-bold mb-4 text-center">
+          {step === 1
+            ? "Step 1: Business Details"
+            : "Step 2: Owner & Address Details"}
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          {renderFields()}
+
+          <div className="flex justify-between mt-6">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={prevStep}
+                className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+              >
+                Back
+              </button>
+            )}
+            {step < 2 ? (
+              <button
+                type="button"
+                onClick={nextStep}
+                className="px-4 py-2 bg-[#2584C6] text-white rounded hover:bg-[#1f6fa7]"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loadingSubmit}
+                className={`px-4 py-2 text-white rounded ${
+                  loadingSubmit
+                    ? "bg-green-300 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                {loadingSubmit ? (
+                  <div className="flex items-center justify-center">
+                    <ClipLoader size={18} color="#fff" />
+                    <span className="ml-2">Submitting...</span>
+                  </div>
+                ) : (
+                  "Submit"
+                )}
+              </button>
+            )}
+          </div>
+        </form>
+
+        <ToastContainer position="top-right" autoClose={3000} />
+      </div>
     </div>
   );
 };
